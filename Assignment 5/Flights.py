@@ -110,6 +110,7 @@ def task_3_dbscan(flight_data):
     plt.matplotlib.pyplot.savefig('task_3_dbscan.png')
     plt.clf()
     outliers=flight_data.loc[flight_data['dbscan_labels']==-1]
+    clean_data = []
     for Index,Row in outliers.iterrows():
         minimum = float('inf')
         for label in unique_labels:
@@ -130,12 +131,8 @@ def task_3_dbscan(flight_data):
                 if row['dbscan_labels'] == closest_cluster:
                     sum=sum+((row['Price']-closest_cluster_price)**2)
                     counter+=1
-            prices=max(closest_cluster_price-2*math.sqrt(sum/counter),50)
-            if prices<min:
-                min=prices
-    clean_data=[]
-    for index,row in flight_data.loc[flight_data['Price']<min].iterrows():
-        clean_data.append([row['Price'],row['Date_of_Flight']])
+            if Row['Price']<=max(closest_cluster_price-2*math.sqrt(sum/counter),50):
+                clean_data.append([Row['Price'],Row['Date_of_Flight']])
     return pd.DataFrame(clean_data, columns=['Price', 'Date_of_Flight'])
 def scrape_data(start_date,from_place,to_place,city_name):
     driver = webdriver.Chrome()
@@ -252,8 +249,8 @@ def scrape_data_90(start_date,from_place,to_place,city_name):
     return df
 
 #date=datetime.strptime("2017-04-17","%Y-%m-%d")
-#df=scrape_data(date,"New York","Russia","Kazan")
-#task_3_dbscan(df)
+#df=scrape_data(date,"New York","Russia","Moscow")
+#print task_3_dbscan(df)
 #task_3_IQR(df)
 #task_4_dbscan(df)
 #scrape_data_90(date,"EWR","Mexico","Cancun")
